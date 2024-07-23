@@ -21,6 +21,7 @@ if "serve" in COMMAND_LINE_TARGETS or "run" in COMMAND_LINE_TARGETS:
 
 web_files = [
     "audio_driver_web.cpp",
+    "webmidi_driver.cpp",
     "display_server_web.cpp",
     "http_client_web.cpp",
     "javascript_bridge_singleton.cpp",
