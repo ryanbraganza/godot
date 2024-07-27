@@ -3,7 +3,11 @@
 #include <emscripten.h>
 
 Error MIDIDriverWebMidi::open() {
-	return OK;
+	Error error = godot_js_webmidi_open_midi_inputs();
+	if (error == ERR_UNAVAILABLE) {
+		ERR_PRINT("Web MIDI is not supported on this browser");
+	}
+	return error;
 }
 
 

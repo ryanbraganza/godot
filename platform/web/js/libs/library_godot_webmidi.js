@@ -1,5 +1,5 @@
 /**************************************************************************/
-/*  webmidi_driver.h                                                      */
+/*  library_godot_webmidi.js                                              */
 /**************************************************************************/
 /*                         This file is part of:                          */
 /*                             GODOT ENGINE                               */
@@ -28,33 +28,22 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#ifndef MIDI_DRIVER_WEBMIDI_H
-#define MIDI_DRIVER_WEBMIDI_H
-#endif
+let midiInputs = [];
 
-#include "core/os/midi_driver.h"
-#include "core/templates/vector.h"
+const GodotWebMidi = {
+	godot_js_webmidi_open_midi_inputs__proxy: 'sync',
+	godot_js_webmidi_open_midi_inputs__sig: 'i',
+	godot_js_webmidi_open_midi_inputs: function () {
+		console.log('open_midi_inputs');
+		if (!navigator.requestMIDIAccess) {
+			return 2; // ERR_UNAVAILABLE
+		}
+		navigator.requestMIDIAccess().then(midi => {
+		  const inputs = midi.inputs.values();
+		});
 
-#include "core/error/error_macros.h"
-
-#include <stdio.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern Error godot_js_webmidi_open_midi_inputs();
-
-#ifdef __cplusplus
-}
-#endif
-
-
-class MIDIDriverWebMidi : public MIDIDriver {
-public:
-	virtual Error open() override;
-	virtual void close() override final;
-
-	MIDIDriverWebMidi() = default;
-	virtual ~MIDIDriverWebMidi();
+		return 0;
+	},
 };
+
+mergeInto(LibraryManager.library, GodotWebMidi);
