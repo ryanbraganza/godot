@@ -32,6 +32,7 @@
 #define MIDI_DRIVER_WEBMIDI_H
 #endif
 
+#include "core/variant/array.h"
 #include "core/os/midi_driver.h"
 #include "core/templates/vector.h"
 
@@ -39,11 +40,14 @@
 
 #include <stdio.h>
 
+#include "godot_js.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern Error godot_js_webmidi_open_midi_inputs();
+extern Error godot_js_webmidi_open_midi_inputs(void (*p_callback)(int p_size, const char **p_connected_input_names));
+//extern int godot_js_tts_get_voices(void (*p_callback)(int p_size, const char **p_voices));
 
 #ifdef __cplusplus
 }
@@ -52,9 +56,15 @@ extern Error godot_js_webmidi_open_midi_inputs();
 
 class MIDIDriverWebMidi : public MIDIDriver {
 public:
+	// Override return type to make writing static callbacks less tedious.
+	static MIDIDriverWebMidi *get_singleton();
+
 	virtual Error open() override;
 	virtual void close() override final;
 
 	MIDIDriverWebMidi() = default;
 	virtual ~MIDIDriverWebMidi();
+
+	WASM_EXPORT static void set_input_names_callback(int p_size, const char **p_input_names);
+	static void _set_input_names_callback(const Vector<String> &p_input_names);
 };

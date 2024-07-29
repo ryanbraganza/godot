@@ -31,18 +31,30 @@
 let midiInputs = [];
 
 const GodotWebMidi = {
+	$GodotWebMidi__deps: ['$GodotRuntime', '$GodotConfig', '$GodotEventListeners'],
+	$GodotWebMidi: {
+		init: null,
+	},
+	godot_js_webmidi_open_midi_inputs__deps: ['$GodotWebMidi'],
 	godot_js_webmidi_open_midi_inputs__proxy: 'sync',
-	godot_js_webmidi_open_midi_inputs__sig: 'i',
-	godot_js_webmidi_open_midi_inputs: function () {
+	godot_js_webmidi_open_midi_inputs__sig: 'ii',
+	godot_js_webmidi_open_midi_inputs: function (p_set_input_names_cb) {
+		const set_input_names_cb = GodotRuntime.get_func(p_set_input_names_cb);
 		console.log('open_midi_inputs');
 		if (!navigator.requestMIDIAccess) {
 			return 2; // ERR_UNAVAILABLE
 		}
+
 		navigator.requestMIDIAccess().then(midi => {
-		  const inputs = midi.inputs.values();
+			const inputs = [...midi.inputs.values()];
+			const input_names = inputs.map(input => input.name);
+
+			console.log('JS inputs', input_names);
+			const c_ptr = GodotRuntime.allocStringArray(input_names);
+			set_input_names_cb(input_names.length, c_ptr);
 		});
 
-		return 0;
+		return 0; // OK
 	},
 };
 
