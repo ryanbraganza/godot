@@ -7,7 +7,7 @@ MIDIDriverWebMidi *MIDIDriverWebMidi::get_singleton() {
 }
 
 Error MIDIDriverWebMidi::open() {
-	Error error = godot_js_webmidi_open_midi_inputs(&MIDIDriverWebMidi::set_input_names_callback);
+	Error error = godot_js_webmidi_open_midi_inputs(&MIDIDriverWebMidi::set_input_names_callback, &MIDIDriverWebMidi::on_midi_message);
 	if (error == ERR_UNAVAILABLE) {
 		ERR_PRINT("Web MIDI is not supported on this browser");
 	}
@@ -16,7 +16,8 @@ Error MIDIDriverWebMidi::open() {
 
 
 void MIDIDriverWebMidi::close()  {
-
+//	void MIDIDriver::send_event(int p_device_index, uint8_t p_status,
+//			const uint8_t *p_data, size_t p_data_len);
 }
 
 MIDIDriverWebMidi::~MIDIDriverWebMidi() {
@@ -43,4 +44,8 @@ void MIDIDriverWebMidi::_set_input_names_callback(const Vector<String> &p_input_
     for (int i = 0; i < p_input_names.size(); i++) {
 		get_singleton()->connected_input_names.push_back(p_input_names[i]);
 	}
+}
+
+void MIDIDriverWebMidi::on_midi_message(int p_device_index, uint8_t p_status, const uint8_t* p_data, size_t p_data_len) {
+	MIDIDriver::send_event(p_device_index, p_status, p_data, p_data_len);
 }

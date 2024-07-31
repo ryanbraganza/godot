@@ -37,9 +37,10 @@ const GodotWebMidi = {
 	},
 	godot_js_webmidi_open_midi_inputs__deps: ['$GodotWebMidi'],
 	godot_js_webmidi_open_midi_inputs__proxy: 'sync',
-	godot_js_webmidi_open_midi_inputs__sig: 'ii',
-	godot_js_webmidi_open_midi_inputs: function (p_set_input_names_cb) {
+	godot_js_webmidi_open_midi_inputs__sig: 'iii',
+	godot_js_webmidi_open_midi_inputs: function (p_set_input_names_cb, p_on_midi_message_cb) {
 		const set_input_names_cb = GodotRuntime.get_func(p_set_input_names_cb);
+		const on_midi_message_cb = GodotRuntime.get_func(p_on_midi_message_cb);
 		console.log('open_midi_inputs');
 		if (!navigator.requestMIDIAccess) {
 			return 2; // ERR_UNAVAILABLE
@@ -50,8 +51,32 @@ const GodotWebMidi = {
 			const input_names = inputs.map(input => input.name);
 
 			console.log('JS inputs', input_names);
+
 			const c_ptr = GodotRuntime.allocStringArray(input_names);
 			set_input_names_cb(input_names.length, c_ptr);
+			GodotRuntime.freeStringArray(c_ptr, input_names.length);
+
+			const MAX_DATA_SIZE = 3;
+			const c_ptr_data = GodotRuntime.malloc(MAX_DATA_SIZE * Uint8Array.BYTES_PER_ELEMENT);
+			// TODO free
+
+			inputs.forEach((input, i) => {
+				input.addEventListener('midimessage', (event) => {
+					const status = event.data[0];
+					const data = event.data.slice(1);
+					const size = data.length;
+
+					if (size > MAX_DATA_SIZE) {
+						throw new Error(`data too big ${size} > ${MAX_DATA_SIZE}`);
+					}
+
+					HEAPU8.set(data, c_ptr_data);
+//					// https://stackoverflow.com/questions/71681491/passing-arrays-and-objects-from-javascript-to-c-in-web-assembly/77931005#77931005
+
+					on_midi_message_cb(i, status, c_ptr_data, data.length);
+
+				});
+			});
 		});
 
 		return 0; // OK

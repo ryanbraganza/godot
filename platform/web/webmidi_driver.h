@@ -46,7 +46,10 @@
 extern "C" {
 #endif
 
-extern Error godot_js_webmidi_open_midi_inputs(void (*p_callback)(int p_size, const char **p_connected_input_names));
+extern Error godot_js_webmidi_open_midi_inputs(
+		void (*p_callback)(int p_size, const char **p_connected_input_names),
+		void (*p_on_midi_message)(int p_device_index, uint8_t p_status, const uint8_t* p_data, size_t p_data_len)
+);
 //extern int godot_js_tts_get_voices(void (*p_callback)(int p_size, const char **p_voices));
 
 #ifdef __cplusplus
@@ -67,4 +70,7 @@ public:
 
 	WASM_EXPORT static void set_input_names_callback(int p_size, const char **p_input_names);
 	static void _set_input_names_callback(const Vector<String> &p_input_names);
+
+	WASM_EXPORT static void on_midi_message(int p_device_index, uint8_t p_status, const uint8_t* p_data, size_t p_data_len);
+//	static void _set_input_names_callback(const Vector<String> &p_input_names);
 };

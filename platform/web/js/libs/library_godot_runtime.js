@@ -125,6 +125,15 @@ const GodotRuntime = {
 			GodotRuntime.free(p_ptr);
 		},
 
+//		allocUint8Array: function(p_arr) {
+//			const size = p_arr.length;
+//			const c_ptr = GodotRuntime.malloc(size);
+//			for (let i=0; i < size; i++) {
+//				HEAP32[c_ptr >> 2 + i] = p_arr[i];
+//			}
+//			return c_ptr;
+//		},
+
 		stringToHeap: function (p_str, p_ptr, p_len) {
 			return stringToUTF8Array(p_str, HEAP8, p_ptr, p_len);
 		},
